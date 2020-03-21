@@ -1,0 +1,19 @@
+Package: gagam
+Type: Package
+Title: Genetic Algorithm for Generalized Additive Models
+Version: 0.1
+Author: Mark Cus <mark-cus@outlook.com>
+Maintainer: Mark Cus <mark-cus@outlook.com>
+Description: This package implements a genetic algorithm which performs simulatenous variable selection and structure discovery in generalized additive models.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.0
+Depends:
+    utils,
+    stats,
+    mgcv,
+    parallel,
+    foreach,
+    doParallel,
+    doMC
