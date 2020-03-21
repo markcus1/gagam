@@ -17,3 +17,5 @@ Depends:
     foreach,
     doParallel,
     doMC
+URL: https://github.com/markcus1/gagam
+BugReports: https://github.com/markcus1/gagam/issues
