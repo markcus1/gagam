@@ -4,6 +4,7 @@
 #'
 #' @param gagam \code{gagam} object (result of the \code{gagam()} function)
 #' @param newdata Matrix or data frame with explanatory variables. The order of columns must be the same as that used to construct the gagam object. If missing, the function extracts in-sample predictions.
+#' @param reduc If prediction should be from one of the reduced models, specify the index of reduction. Specify only one index at a time. Default is NULL.
 #'
 #' @return A vector of predictions.
 #' @export
@@ -37,16 +38,34 @@
 #' @import foreach
 #' @import doParallel
 #' @import doMC
-predict_gagam <- function(gagam,newdata){
-  gam_obj <- gagam$best_gam
+predict_gagam <- function(gagam,newdata,reduc=NULL){
+  if (is.null(reduc)){
+    gam_obj <- gagam$best_gam
 
-  if (missing(newdata)){
-    predict.gam(gam_obj)
+    if (missing(newdata)){
+      predict.gam(gam_obj)
+    } else {
+      ndata <- as.data.frame(newdata)
+      colnames(ndata) <- c("y",paste0("x",1:as.numeric(NCOL(ndata)-1)))
+
+      predict.gam(gam_obj,newdata=ndata)
+    }
   } else {
-    ndata <- as.data.frame(newdata)
-    colnames(ndata) <- c("y",paste0("x",1:as.numeric(NCOL(ndata)-1)))
+    if (is.null(gagam[[paste0("best_gam_red",reduc)]])){
+      stop("gagam doesn't contain the specified reduced model")
+    }
+    if (length())
+    gam_obj <- gagam[[paste0("best_gam_red",reduc)]]
 
-    predict.gam(gam_obj,newdata=ndata)
+    if (missing(newdata)){
+      predict.gam(gam_obj)
+    } else {
+      ndata <- as.data.frame(newdata)
+      colnames(ndata) <- c("y",paste0("x",1:as.numeric(NCOL(ndata)-1)))
+
+      predict.gam(gam_obj,newdata=ndata)
+    }
+
   }
 
 }

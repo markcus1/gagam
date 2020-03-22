@@ -16,7 +16,11 @@ gagam(
   p_nonpar = 0.1,
   p_int_nonpar = 0.1,
   multicore = TRUE,
-  k = 10
+  k = 10,
+  family = gaussian(),
+  method = "REML",
+  optimizer = c("outer", "newton"),
+  reduc = NULL
 )
 }
 \arguments{
@@ -24,7 +28,7 @@ gagam(
 
 \item{x}{Matrix or data frame containing all considered explanatory variables.}
 
-\item{pop_size}{Size of the population (in multiples of 500). Default is 500.}
+\item{pop_size}{Size of the population (needs to be a multiple of 500). Default is 500.}
 
 \item{Kvar}{Maximum number of variables allowed in the final model. Default is 15.}
 
@@ -34,7 +38,7 @@ gagam(
 
 \item{p_m}{Mutation rate for variables. Default is 0.05.}
 
-\item{p_int}{Mutation rate of interactions of variables. Default is 0.1.}
+\item{p_int}{Mutation rate for interactions of variables. Default is 0.1.}
 
 \item{p_nonpar}{Mutation rate for the linear/nonparametric indicators for variables. Default is 0.1.}
 
@@ -43,6 +47,14 @@ gagam(
 \item{multicore}{Whether to use multiple cores in computation. Strongly recommended but may not work on Windows. Default is TRUE.}
 
 \item{k}{Basis dimension for nonparametric terms estimated using cubic splines. Default is 10.}
+
+\item{family}{Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().}
+
+\item{method}{Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".}
+
+\item{optimizer}{Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").}
+
+\item{reduc}{Implements additional variable reduction at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See PAPER for an explanation of the methods. Default is NULL.}
 }
 \value{
 A list containing: gam object from the mgcv package (estimated best model), vector of indexes of variables included linearly, vector of indexes of variables included nonparametrically (and the same lists for interactions if Kint is greater than 0).

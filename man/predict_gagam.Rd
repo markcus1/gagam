@@ -4,12 +4,14 @@
 \alias{predict_gagam}
 \title{Prediction from GAGAM}
 \usage{
-predict_gagam(gagam, newdata)
+predict_gagam(gagam, newdata, reduc = NULL)
 }
 \arguments{
 \item{gagam}{\code{gagam} object (result of the \code{gagam()} function)}
 
 \item{newdata}{Matrix or data frame with explanatory variables. The order of columns must be the same as that used to construct the gagam object. If missing, the function extracts in-sample predictions.}
+
+\item{reduc}{If prediction should be from one of the reduced models, specify the index of reduction. Specify only one index at a time. Default is NULL.}
 }
 \value{
 A vector of predictions.

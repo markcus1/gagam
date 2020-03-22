@@ -7,13 +7,16 @@
 #' @param Kvar Maximum number of variables allowed in the final model
 #' @param Kint Maximum number of interactions allowed in the final model
 #' @param k Basis dimension for nonparametric terms estimated using cubic splines.
+#' @param family Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().
+#' @param method Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".
+#' @param optimizer Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").
 #'
 #' @return BIC value of the model
 #'
 #' @import utils
 #' @import stats
 #' @import mgcv
-biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k){ #gonna take each element in the list (using mclapply)
+biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,optimizer){ #gonna take each element in the list (using mclapply)
   `%nin%` <- Negate(`%in%`)
   mains <- pop_matrix_row[1:Kvar] #extract mains into a vector
   if (length(mains) == 0){ #if there are no mains then exit (return a huge number)
@@ -61,10 +64,10 @@ biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k){ #gonna take each
   all_ind <- c(mains,ints,nonparmain,nonparint) #combines all terms together
   formula_f <- as.formula(paste0("y~",paste(all_ind,collapse = "+"))) #creates the formula
 
-  gamfit <- gam(formula_f,data = all_dataframe,family=gaussian(),method = "REML",optimizer=c("outer","newton")) #estimate gam
+  gamfit <- gam(formula_f,data = all_dataframe,family=family,method=method,optimizer=optimizer) #estimate gam
 
   if (gamfit$converged == FALSE){ #sometimes the model won't converge on the first try but will on the second
-    gamfit <- gam(formula_f,data = all_dataframe,family=gaussian(),method = "REML",optimizer=c("outer","newton")) #so we give it another try if it doesn't work
+    gamfit <- gam(formula_f,data = all_dataframe,family=family,method=method,optimizer=optimizer) #so we give it another try if it doesn't work
     if (gamfit$converged == FALSE){
       return(99999) #and if it still doesn't work we give up
     }

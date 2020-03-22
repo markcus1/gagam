@@ -4,7 +4,16 @@
 \alias{biccalc}
 \title{BIC Calculator}
 \usage{
-biccalc(pop_matrix_row, all_dataframe, Kvar, Kint, k)
+biccalc(
+  pop_matrix_row,
+  all_dataframe,
+  Kvar,
+  Kint,
+  k,
+  family,
+  method,
+  optimizer
+)
 }
 \arguments{
 \item{pop_matrix_row}{Vector containing a model}
@@ -16,6 +25,12 @@ biccalc(pop_matrix_row, all_dataframe, Kvar, Kint, k)
 \item{Kint}{Maximum number of interactions allowed in the final model}
 
 \item{k}{Basis dimension for nonparametric terms estimated using cubic splines.}
+
+\item{family}{Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().}
+
+\item{method}{Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".}
+
+\item{optimizer}{Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").}
 }
 \value{
 BIC value of the model
