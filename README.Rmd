@@ -56,7 +56,7 @@ example_gagam
 
 The output is a list. The first element contains the optimal model as determined by GAGAM as a fitted `mgcv::gam` object. The second and third elements show which variables the algorithm included in the model linearly and nonparametrically, respectively.
 
-We can see that GAGAM correctly extracted the true model - $x_1, x_2, x_3$ are included linearly, $x_4$ is included nonparametrically, and the other variables are excluded.
+We can see that GAGAM correctly extracted the true model - $x_1$, $x_2$, $x_3$ are included linearly, $x_4$ is included nonparametrically, and the other variables are excluded.
 
 ## Arguments
 As the example above demonstrates, the main function implementing GAGAM is `gagam()`. This section explains the options available to the user when implementing `gagam()`.

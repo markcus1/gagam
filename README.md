@@ -188,8 +188,8 @@ the user can increase it in steps of 500 (e.g. to 1000, 1500, 2000, …).
 example above we had 10 explanatory variables but we decided that we
 will only choose among models with six or fewer predictors. This
 argument is especially important if we have more explanatory variables
-than observations (\(p>n\)). Then, `Kvar` should always be set to a
-number lower than \(n\), otherwise the algorithm might arrive at an
+than observations ($p>n$). Then, `Kvar` should always be set to a
+number lower than $n$, otherwise the algorithm might arrive at an
 overdetermined model and return an error.
 
 `Kint` extends the model from the introduction to also allow first-order
