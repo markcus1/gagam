@@ -2,6 +2,8 @@
 #'
 #' @description Alternative function to calculate the BIC of the model. Internal use only.
 #'
+#' @keywords internal
+#'
 #' @param pop_matrix_row Vector containing a model
 #' @param all_dataframe Dataframe with all variables
 #' @param Kvar Maximum number of variables allowed in the final model
@@ -10,15 +12,27 @@
 #' @param family Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().
 #' @param method Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".
 #' @param optimizer Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").
+#' @param always_par Specifies which variables are always estimated parametrically
+#' @param xcolnames Names of variables (optional).
 #'
 #' @return BIC value of the model
 #'
 #' @import utils
 #' @import stats
 #' @import mgcv
-biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,optimizer){ #gonna take each element in the list (using mclapply)
+biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par){ #gonna take each element in the list (using mclapply)
   `%nin%` <- Negate(`%in%`)
   mains <- pop_matrix_row[1:Kvar] #extract mains into a vector
+  if (!is.null(xcolnames)){
+    for (i in 1:length(mains)){
+      temp_main <- mains[i]
+      if (temp_main == "0"){
+        next
+      }
+      mains[i] <- xcolnames[as.numeric(substr(temp_main,2,10))]
+    }
+  }
+
   if (length(mains) == 0){ #if there are no mains then exit (return a huge number)
     return(99999)
   }
@@ -27,6 +41,19 @@ biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,opti
   }
   if (Kint > 0){
     ints <- pop_matrix_row[as.numeric(Kvar+1):as.numeric(Kvar+Kint)] #extract interactions into a vector
+    if (!is.null(xcolnames)){
+      for (i in 1:length(ints)){
+        temp_int <- ints[i]
+        if (temp_int == "0"){
+          next
+        }
+        col_pos <- sapply(gregexpr(":",temp_int),"[",1)
+        temp_int_1 <- as.numeric(substr(temp_int,2,as.numeric(col_pos-1)))
+        temp_int_2 <- as.numeric(substr(temp_int,as.numeric(col_pos+2),10))
+        ints[i] <- paste0(xcolnames[temp_int_1],":",xcolnames[temp_int_2])
+      }
+    }
+
     nonparint <- pop_matrix_row[as.numeric(Kvar+Kint+Kvar+1):as.numeric(Kvar+Kint+Kvar+Kint)] #extract nonpars on interactions into a vector
 
     nonparint <- ints[which(nonparint!="0")] #stores nonparametric interactions
@@ -39,7 +66,7 @@ biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,opti
       part1 <- as.matrix(substr(nonparint,1,as.numeric(colon_pos-1))) #matrix of first vars in each int
       part2 <- as.matrix(substr(nonparint,as.numeric(colon_pos+1),100)) #matrix of second vars in each int
 
-      nonparint <- paste0("ti(",part1,",",part2,",bs='cr',k=",k,")") #put the ints together along with the wrapper
+      nonparint <- paste0("ti(",part1,",",part2,",bs='",bs,"',k=",k,")") #put the ints together along with the wrapper
 
     } else {
       nonparint <- NULL
@@ -50,6 +77,13 @@ biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,opti
     nonparint <- NULL
   }
   nonparmain <- pop_matrix_row[as.numeric(Kvar+Kint+1):as.numeric(Kvar+Kint+Kvar)] #extract nonpars on mains into a vector
+
+  mains2 <- pop_matrix_row[1:Kvar]
+
+  if (!is.null(always_par)){
+    nonparmain[mains2 %in% always_par] <- "0"
+  }
+
   nonparmain <- mains[which(nonparmain!="0")]  #stores nonparametric mains
   mains <- mains[which(mains!="0")] #removes zeros in mains
   if (length(mains) == 0){
@@ -57,12 +91,16 @@ biccalc2 <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,opti
   }
   mains <- mains[which(mains %nin% nonparmain)] #stores parametric mains
   if (length(nonparmain)>0){
-    nonparmain <- paste0("s(",nonparmain,",bs='cr',k=",k,")") #adds the wrapper to the nonpar mains
+    nonparmain <- paste0("s(",nonparmain,",bs='",bs,"',k=",k,")") #adds the wrapper to the nonpar mains
   } else {
     nonparmain <- NULL
   }
   all_ind <- c(mains,ints,nonparmain,nonparint) #combines all terms together
   formula_f <- as.formula(paste0("y~",paste(all_ind,collapse = "+"))) #creates the formula
+
+  if (!is.null(xcolnames)){
+    colnames(all_dataframe) <- c("y",xcolnames)
+  }
 
   gamfit <- gam(formula_f,data = all_dataframe,family=family,method=method,optimizer=optimizer) #estimate gam
 

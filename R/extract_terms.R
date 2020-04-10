@@ -2,6 +2,8 @@
 #'
 #' @description Extracts linear and nonparametric variables from a model. Internal use only.
 #'
+#' @keywords internal
+#'
 #' @param individual Vector containing a model
 #' @param Kvar Maximum number of variables allowed in the final model
 #' @param Kint Maximum number of interactions allowed in the final model

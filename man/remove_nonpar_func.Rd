@@ -38,3 +38,4 @@ Reduced model.
 \description{
 Additional reduction of nonparametric terms after the genetic algorithm has finished. Internal use only.
 }
+\keyword{internal}

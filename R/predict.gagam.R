@@ -1,12 +1,14 @@
 #' @title Prediction from GAGAM
 #'
-#' @description Takes the result of variable and structure discovery search using a genetic algorithm (\code{gagam()} function) and produces predictions given a set of values for the explanatory variables.
+#' @description Predict method for \code{gagam} objects.
 #'
-#' @param gagam \code{gagam} object (result of the \code{gagam()} function)
-#' @param newdata Matrix or data frame with explanatory variables. The order of columns must be the same as that used to construct the gagam object. If missing, the function extracts in-sample predictions.
+#' @param object \code{gagam} object (result of the \code{gagam()} function)
+#' @param newdata Matrix or data frame with explanatory variables. The order of columns and their names must be the same as that used to construct the gagam object. If missing, the function extracts in-sample predictions.
 #' @param reduc If prediction should be from one of the reduced models, specify the index of reduction. Specify only one index at a time. Default is NULL.
+#' @param ... Any other arguments to pass to \code{\link[mgcv]{predict.gam}}.
 #'
 #' @return A vector of predictions.
+#' @rdname predict.gagam
 #' @export
 #'
 #' @examples
@@ -38,32 +40,42 @@
 #' @import foreach
 #' @import doParallel
 #' @import doMC
-predict_gagam <- function(gagam,newdata,reduc=NULL){
+predict.gagam <- function(object,..., newdata, reduc=NULL){
+  gagam <- object
   if (is.null(reduc)){
     gam_obj <- gagam$best_gam
 
     if (missing(newdata)){
-      predict.gam(gam_obj)
+      predict.gam(gam_obj,...)
     } else {
       ndata <- as.data.frame(newdata)
-      colnames(ndata) <- c("y",paste0("x",1:as.numeric(NCOL(ndata)-1)))
+      if (is.null(colnames(newdata))){
+        colnames(ndata) <- paste0("x",1:as.numeric(NCOL(ndata)-1))
+      } else {
+        colnames(ndata) <- colnames(newdata)
+      }
 
-      predict.gam(gam_obj,newdata=ndata)
+      predict.gam(gam_obj,newdata=ndata,...)
     }
   } else {
     if (is.null(gagam[[paste0("best_gam_red",reduc)]])){
-      stop("gagam doesn't contain the specified reduced model")
+      stop("gagam object doesn't contain the specified reduced model")
     }
     if (length())
     gam_obj <- gagam[[paste0("best_gam_red",reduc)]]
 
     if (missing(newdata)){
-      predict.gam(gam_obj)
+      predict.gam(gam_obj,...)
     } else {
       ndata <- as.data.frame(newdata)
+      if (is.null(colnames(newdata))){
+        colnames(ndata) <- paste0("x",1:as.numeric(NCOL(ndata)-1))
+      } else {
+        colnames(ndata) <- colnames(newdata)
+      }
       colnames(ndata) <- c("y",paste0("x",1:as.numeric(NCOL(ndata)-1)))
 
-      predict.gam(gam_obj,newdata=ndata)
+      predict.gam(gam_obj,newdata=ndata,...)
     }
 
   }

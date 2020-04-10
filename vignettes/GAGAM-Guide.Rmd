@@ -1,23 +1,22 @@
 ---
-output: github_document
+title: "Genetic Algorithm for Generalized Additive Models"
+author: "Mark Cus"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{GAGAM User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
-
-<!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
+  comment = "#>"
 )
 ```
 
-# Genetic Algorithm for Generalized Additive Models
-
-<!-- badges: start -->
-<!-- badges: end -->
-
+## Introduction
 This package implements a genetic algorithm which performs simulatenous variable selection and structure discovery in generalized additive models of the form:
 $$g(\mathbb{E}(y_i)) = \alpha + \sum_{j\in \mathcal{L}} \beta_j x_{ij} + \sum_{k \in \mathcal{N}} f_k(x_{ik}) + \varepsilon_i$$
 For a given dependent variable and a set of explanatory variables, the genetic algorithm determines which regressors should be included linearly (set $\mathcal{L}$), which nonparametrically (set $\mathcal{N}$), and which should be excluded from the regression equation. The aim is to minimize the Bayesian Information Criterion value of the model.
@@ -39,7 +38,7 @@ library(gagam)
 Suppose we have a dependent variable, $y$, ten explanatory variables, $x_1,x_2,\ldots,x_{10}$, and the true model only contains the first four. Moreover, $x_1, \ldots, x_3$ have a linear effect on $y$ while $x_4$ has a nonlinear relationship with the dependent variable. We now demonstrate how to use `gagam()` to extract the true model. 
 
 Begin by generating the data:
-``` r
+```{r}
 N <- 500 #number of observations
 set.seed <- 123
 xdat <- matrix(rnorm(N*10,0,1),nrow=N,ncol=10) #matrix of explanatory variables (each drawn from N(0,1))
@@ -47,7 +46,7 @@ ydat <- 4*xdat[,1]+5*xdat[,2]+6*xdat[,3]+(xdat[,4])^2 + 4 + rnorm(N,0,0.25) #gen
 ```
 
 We can now run GAGAM using:
-``` r
+```{r}
 example_gagam <- gagam(y=ydat,x=xdat,Kvar=6,no_gen=50,multicore=FALSE)
 example_gagam
 ```
@@ -124,7 +123,7 @@ More than one reduction can be specified, e.g. `reduc=c(1,2,3)`. `gagam` will re
 ## Summary, Plot, Predict
 Summary, plot, and predict methods are available for objects returned by `gagam`. These essentially just take the fitted `mgcv::gam` object contained in the `gagam` output and pass it to summary.gam/plot.gam/predict.gam. If one of the `reduc` options was used, one can specify which model to use (`NULL` for the original model, `reduc = 1` for the model reduced using `reduc=c(1)` etc.). We also allow the user to pass through additional arguments for `plot.gam`/`predict.gam`.
 
-``` r
+```{r,fig.align="center"}
 summary(example_gagam)
 plot(example_gagam)
 ```
@@ -132,7 +131,7 @@ plot(example_gagam)
 ## Boston Housing Example
 The following code shows how to apply GAGAM to the Boston Housing data set.
 
-``` r
+```{r}
 library(mlbench)
 data(BostonHousing)
 
@@ -143,4 +142,6 @@ x <- BostonHousing[,1:13]
 
 #summary(boston_gam)
 ```
+
+
 

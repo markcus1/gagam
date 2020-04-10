@@ -19,3 +19,4 @@ A list specifying which variables are included linearly and which are included n
 \description{
 Extracts linear and nonparametric variables from a model. Internal use only.
 }
+\keyword{internal}

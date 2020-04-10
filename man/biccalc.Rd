@@ -10,9 +10,11 @@ biccalc(
   Kvar,
   Kint,
   k,
+  bs,
   family,
   method,
-  optimizer
+  optimizer,
+  always_par
 )
 }
 \arguments{
@@ -31,6 +33,8 @@ biccalc(
 \item{method}{Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".}
 
 \item{optimizer}{Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").}
+
+\item{always_par}{Specifies which variables are always estimated parametrically}
 }
 \value{
 BIC value of the model
@@ -38,3 +42,4 @@ BIC value of the model
 \description{
 Calculates the BIC of the model. Internal use only.
 }
+\keyword{internal}

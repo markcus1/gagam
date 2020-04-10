@@ -16,17 +16,20 @@ gagam(
   p_nonpar = 0.1,
   p_int_nonpar = 0.1,
   multicore = TRUE,
+  cores = NULL,
   k = 10,
+  bs = "cr",
   family = gaussian(),
   method = "REML",
   optimizer = c("outer", "newton"),
-  reduc = NULL
+  reduc = NULL,
+  always_par = NULL
 )
 }
 \arguments{
-\item{y}{Vector, matrix, or data frame containing observations of the dependent variable.}
+\item{y}{Vector, matrix, data frame, or factor containing observations of the dependent variable.}
 
-\item{x}{Matrix or data frame containing all considered explanatory variables.}
+\item{x}{Matrix or data frame containing all considered explanatory variables. If the columns have names those will be used for variable names in the final output.}
 
 \item{pop_size}{Size of the population (needs to be a multiple of 500). Default is 500.}
 
@@ -46,18 +49,24 @@ gagam(
 
 \item{multicore}{Whether to use multiple cores in computation. Strongly recommended but may not work on Windows. Default is TRUE.}
 
-\item{k}{Basis dimension for nonparametric terms estimated using cubic splines. Default is 10.}
+\item{cores}{Number of cores to use with multicore. Default (\code{NULL}) uses all cores.}
 
-\item{family}{Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().}
+\item{k}{Basis dimension for nonparametric terms estimated using splines. Default is 10.}
 
-\item{method}{Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".}
+\item{bs}{Spline basis for nonparametric terms. Specified as a two letter character string. Default is the natural cubic spline, bs="cr". See \code{\link[mgcv]{smooth.terms}} for an overview of what is available.}
 
-\item{optimizer}{Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").}
+\item{family}{Specifies the family for the gam (see \code{\link[stats]{family}} and \code{\link[mgcv]{family.mgcv}}). Default is gaussian().}
 
-\item{reduc}{Implements additional variable reduction at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See PAPER for an explanation of the methods. Default is NULL.}
+\item{method}{Specifies the metric for smoothing parameter selection (see \code{\link[mgcv]{gam}}). Default is "REML".}
+
+\item{optimizer}{Specifies the numerical optimization algorithm for the gam (see \code{\link[mgcv]{gam}}). Default is c("outer","newton").}
+
+\item{reduc}{Implements additional variable elimination methods at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See \href{https://github.com/markcus1/gagam/tree/master/R}{GAGAM paper} for an explanation of the methods. Default is NULL.}
+
+\item{always_par}{Vector of the column numbers (in x) of the variables always estimated parametrically (for noncontinuous predictors).}
 }
 \value{
-A list containing: gam object from the mgcv package (estimated best model), vector of indexes of variables included linearly, vector of indexes of variables included nonparametrically (and the same lists for interactions if Kint is greater than 0).
+A list containing: \code{\link[mgcv]{gam}} object (fitted best model), vector of indexes or names of variables included linearly, vector of indexes or names of variables included nonparametrically (and the same lists for interactions if Kint is greater than 0).
 }
 \description{
 Implements the genetic algorithm for simultaneous variable selection and structure discovery in generalized additive models. For a given dependent variable and a set of explanatory variables, the genetic algorithm determines which regressors should be included linearly, which nonparametrically, and which should be excluded from the regression equation. The aim is to minimize the Bayesian Information Criterion value of the model.
@@ -72,4 +81,7 @@ ydat <- 4*xdat[,1]+5*xdat[,2]+6*xdat[,3]+(xdat[,4])^2 + 4 + rnorm(N,0,0.25)
 example_gagam <- gagam(ydat,xdat,Kvar = 6,no_gen = 50)
 }
 
+}
+\references{
+Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". http://www.markcus.com/paper.pdf.
 }

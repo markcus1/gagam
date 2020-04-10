@@ -2,6 +2,8 @@
 #'
 #' @description Additional reduction of nonparametric terms after the genetic algorithm has finished. Internal use only.
 #'
+#' @keywords internal
+#'
 #' @param best_ind Vector contain the model.
 #' @param all_dataframe Data frame with all variables.
 #' @param Kvar Maximum number of variables allowed in the final model

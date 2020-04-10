@@ -19,3 +19,9 @@ Depends:
     doMC
 URL: https://github.com/markcus1/gagam
 BugReports: https://github.com/markcus1/gagam/issues
+Suggests: 
+    knitr,
+    rmarkdown,
+    mlbench
+VignetteBuilder: knitr
+References: Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". http://www.markcus.com/paper.pdf.

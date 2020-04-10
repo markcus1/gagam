@@ -2,6 +2,8 @@
 #'
 #' @description Sorts the variables in the model and summarizes the variables included and whether they enter linearly or not in a string. For internal use in memoization.
 #'
+#' @keywords internal
+#'
 #' @param individual_row Vector containing the model
 #' @param Kvar Maximum number of variables allowed in the final model
 #' @param Kint Maximum number of interactions allowed in the final model

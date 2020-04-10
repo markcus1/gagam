@@ -2,6 +2,8 @@
 #'
 #' @description Performs crossover between two models. Internal use only.
 #'
+#' @keywords internal
+#'
 #' @param crossover_matrix_row Vector containing both parent models.
 #' @param Kvar Maximum number of variables allowed in the final model
 #' @param Kint Maximum number of interactions allowed in the final model

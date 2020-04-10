@@ -1,0 +1,11 @@
+---
+title: "Simultaneous Variable Selection and Structure Discovery in Generalized Additive Models"
+output: pdf_document
+header-includes:
+  - \usepackage{pdfpages}
+vignette: >
+  %\VignetteIndexEntry{GAGAM Paper}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+\includepdf[pages={-}]{GAGAMpaper.pdf}

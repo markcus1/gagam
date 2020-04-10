@@ -2,6 +2,8 @@
 #'
 #' @description Calculates the BIC of the model. Internal use only.
 #'
+#' @keywords internal
+#'
 #' @param pop_matrix_row Vector containing a model
 #' @param all_dataframe Dataframe with all variables
 #' @param Kvar Maximum number of variables allowed in the final model
@@ -10,13 +12,14 @@
 #' @param family Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().
 #' @param method Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".
 #' @param optimizer Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").
+#' @param always_par Specifies which variables are always estimated parametrically
 #'
 #' @return BIC value of the model
 #'
 #' @import utils
 #' @import stats
 #' @import mgcv
-biccalc <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,optimizer){ #gonna take each element in the list (using mclapply)
+biccalc <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,bs,family,method,optimizer,always_par){ #gonna take each element in the list (using mclapply)
   `%nin%` <- Negate(`%in%`)
   mains <- pop_matrix_row[1:Kvar] #extract mains into a vector
   if (length(mains) == 0){ #if there are no mains then exit (return a huge number)
@@ -39,7 +42,7 @@ biccalc <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,optim
       part1 <- as.matrix(substr(nonparint,1,as.numeric(colon_pos-1))) #matrix of first vars in each int
       part2 <- as.matrix(substr(nonparint,as.numeric(colon_pos+1),100)) #matrix of second vars in each int
 
-      nonparint <- paste0("ti(",part1,",",part2,",bs='cr',k=",k,")") #put the ints together along with the wrapper
+      nonparint <- paste0("ti(",part1,",",part2,",bs='",bs,"',k=",k,")") #put the ints together along with the wrapper
 
     } else {
       nonparint <- NULL
@@ -50,6 +53,11 @@ biccalc <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,optim
     nonparint <- NULL
   }
   nonparmain <- pop_matrix_row[as.numeric(Kvar+Kint+1):as.numeric(Kvar+Kint+Kvar)] #extract nonpars on mains into a vector
+
+  if (!is.null(always_par)){
+    nonparmain[mains %in% always_par] <- "0"
+  }
+
   nonparmain <- mains[which(nonparmain!="0")]  #stores nonparametric mains
   mains <- mains[which(mains!="0")] #removes zeros in mains
   if (length(mains) == 0){
@@ -57,7 +65,7 @@ biccalc <- function(pop_matrix_row,all_dataframe,Kvar,Kint,k,family,method,optim
   }
   mains <- mains[which(mains %nin% nonparmain)] #stores parametric mains
   if (length(nonparmain)>0){
-    nonparmain <- paste0("s(",nonparmain,",bs='cr',k=",k,")") #adds the wrapper to the nonpar mains
+    nonparmain <- paste0("s(",nonparmain,",bs='",bs,"',k=",k,")") #adds the wrapper to the nonpar mains
   } else {
     nonparmain <- NULL
   }

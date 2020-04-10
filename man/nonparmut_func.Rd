@@ -35,3 +35,4 @@ nonparmut_func(mutation_row,Kvar,Kint,pnonpar,pintnonpar)
 }
 
 }
+\keyword{internal}

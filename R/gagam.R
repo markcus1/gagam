@@ -2,8 +2,8 @@
 #'
 #' @description Implements the genetic algorithm for simultaneous variable selection and structure discovery in generalized additive models. For a given dependent variable and a set of explanatory variables, the genetic algorithm determines which regressors should be included linearly, which nonparametrically, and which should be excluded from the regression equation. The aim is to minimize the Bayesian Information Criterion value of the model.
 #'
-#' @param y Vector, matrix, or data frame containing observations of the dependent variable.
-#' @param x Matrix or data frame containing all considered explanatory variables.
+#' @param y Vector, matrix, data frame, or factor containing observations of the dependent variable.
+#' @param x Matrix or data frame containing all considered explanatory variables. If the columns have names those will be used for variable names in the final output.
 #' @param pop_size Size of the population (needs to be a multiple of 500). Default is 500.
 #' @param Kvar Maximum number of variables allowed in the final model. Default is 15.
 #' @param Kint Maximum number of interactions allowed in the final model. Default is 0.
@@ -13,13 +13,16 @@
 #' @param p_nonpar Mutation rate for the linear/nonparametric indicators for variables. Default is 0.1.
 #' @param p_int_nonpar Mutation rate for the linear/nonparametric indicators for interactions. Default is 0.1.
 #' @param multicore Whether to use multiple cores in computation. Strongly recommended but may not work on Windows. Default is TRUE.
-#' @param k Basis dimension for nonparametric terms estimated using cubic splines. Default is 10.
-#' @param family Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().
-#' @param method Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".
-#' @param optimizer Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").
-#' @param reduc Implements additional variable reduction at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See PAPER for an explanation of the methods. Default is NULL.
+#' @param cores Number of cores to use with multicore. Default (\code{NULL}) uses all cores.
+#' @param k Basis dimension for nonparametric terms estimated using splines. Default is 10.
+#' @param bs Spline basis for nonparametric terms. Specified as a two letter character string. Default is the natural cubic spline, bs="cr". See \code{\link[mgcv]{smooth.terms}} for an overview of what is available.
+#' @param family Specifies the family for the gam (see \code{\link[stats]{family}} and \code{\link[mgcv]{family.mgcv}}). Default is gaussian().
+#' @param method Specifies the metric for smoothing parameter selection (see \code{\link[mgcv]{gam}}). Default is "REML".
+#' @param optimizer Specifies the numerical optimization algorithm for the gam (see \code{\link[mgcv]{gam}}). Default is c("outer","newton").
+#' @param reduc Implements additional variable elimination methods at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See \href{https://github.com/markcus1/gagam/tree/master/R}{GAGAM paper} for an explanation of the methods. Default is NULL.
+#' @param always_par Vector of the column numbers (in x) of the variables always estimated parametrically (for noncontinuous predictors).
 #'
-#' @return A list containing: gam object from the mgcv package (estimated best model), vector of indexes of variables included linearly, vector of indexes of variables included nonparametrically (and the same lists for interactions if Kint is greater than 0).
+#' @return A list containing: \code{\link[mgcv]{gam}} object (fitted best model), vector of indexes or names of variables included linearly, vector of indexes or names of variables included nonparametrically (and the same lists for interactions if Kint is greater than 0).
 #' @export
 #'
 #' @examples
@@ -39,15 +42,17 @@
 #' @import foreach
 #' @import doParallel
 #' @import doMC
-gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,p_int = 0.1,p_nonpar=0.1,p_int_nonpar=0.1,multicore=TRUE,k=10,family=gaussian(),method="REML",optimizer=c("outer","newton"),reduc=NULL){
+#'
+#' @references Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". http://www.markcus.com/paper.pdf.
+gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,p_int = 0.1,p_nonpar=0.1,p_int_nonpar=0.1,multicore=TRUE,cores=NULL,k=10,bs="cr",family=gaussian(),method="REML",optimizer=c("outer","newton"),reduc=NULL,always_par=NULL){
   if(missing(y)){
-    stop("Dependent variable (y) is missing.")
+    stop("Dependent variable is missing.")
   }
   if(missing(x)){
     stop("Matrix of explanatory variables is missing.")
   }
-  if (is.matrix(y) == FALSE & is.data.frame(y) == FALSE & is.vector(y) == FALSE){
-    stop("y must be a vector, a matrix, or a data frame.")
+  if (is.matrix(y) == FALSE & is.data.frame(y) == FALSE & is.vector(y) == FALSE & is.factor(y) == FALSE){
+    warning("y is not a vector, matrix, data frame, or factor - is it specified correctly?")
   }
   if (is.matrix(x) == FALSE & is.data.frame(x) == FALSE){
     stop("x must be a matrix or a data frame.")
@@ -61,10 +66,19 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
     stop("The lenghts of x and y do not match.")
   }
   if (Kvar > NCOL(xmatr)){
-    stop("The maximum number of variables included in the model (Kvar) is greater than the number of variables in x.")
+    Kvar <- NCOL(xmatr)
+    warning("The maximum number of variables in the model (Kvar) was greater than the number of variables in x - Kvar is now set to NCOL(x).")
   }
   if (Kvar == 1){
     stop("Kvar should be more than 1.")
+  }
+  if (Kint > 0 & !is.null(always_par)){
+    stop("Always parametric terms currently not supported when interactions are enabled.")
+  }
+  if (!is.null(colnames(x))){
+    xcolnames <- colnames(x)
+  } else {
+    xcolnames <- NULL
   }
   x_names_m <- paste0("x",c(1:NCOL(xmatr)))
   all_data <- cbind(y,xmatr)
@@ -77,7 +91,11 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
   regressors <- NCOL(xmatr)
 
   if (multicore == TRUE){
-    no_cores <- detectCores()
+    if (!is.null(cores)){
+      no_cores <- cores
+    } else {
+      no_cores <- detectCores()
+    }
     registerDoParallel(cores=no_cores)
     registerDoMC(cores=no_cores)
   }
@@ -98,6 +116,10 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
   pnonpar <- p_nonpar
   pintnonpar <- p_int_nonpar
   pc <- 0.5
+
+  if (!is.null(always_par)){
+    always_par <- paste0("x",always_par)
+  }
 
   #########Algorithm
   bic_dict <- as.list(NULL)
@@ -243,9 +265,9 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
       }
 
       if (multicore == TRUE){
-        rmse2 <- mclapply(initpop_split2,biccalc,all_data,Kvar,Kint,k,family,method,optimizer,mc.preschedule = TRUE,mc.cores=getOption("mc.cores",no_cores))
+        rmse2 <- mclapply(initpop_split2,biccalc,all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par,mc.preschedule = TRUE,mc.cores=getOption("mc.cores",no_cores))
       } else {
-        rmse2 <- lapply(initpop_split2,biccalc,all_data,Kvar,Kint,k,family,method,optimizer)
+        rmse2 <- lapply(initpop_split2,biccalc,all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par)
       }
 
       rmse[not_in_dict] <- sapply(rmse2,"[",1)
@@ -273,7 +295,7 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
     for (i in errors){
 
       rmse[[i]] <- tryCatch({
-        return(biccalc(initpop_split[[i]],all_data,Kvar,Kint,k,family,method,optimizer))
+        return(biccalc(initpop_split[[i]],all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par))
       }, warning = function(w) {
       }, error = function(e) {
         return(99999)
@@ -374,9 +396,9 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
   initpop_split <- lapply(seq_len(NROW(initpop)),function(x) initpop[x,])
 
   if (multicore == TRUE){
-    rmse_fin_pop <- mclapply(initpop_split,biccalc,all_data,Kvar,Kint,k,family,method,optimizer,mc.preschedule = TRUE,mc.cores=getOption("mc.cores",no_cores))
+    rmse_fin_pop <- mclapply(initpop_split,biccalc,all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par,mc.preschedule = TRUE,mc.cores=getOption("mc.cores",no_cores))
   } else {
-    rmse_fin_pop <- lapply(initpop_split,biccalc,all_data,Kvar,Kint,k,family,method,optimizer)
+    rmse_fin_pop <- lapply(initpop_split,biccalc,all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par)
   }
 
   rmse_num <- as.numeric(rmse_fin_pop)
@@ -387,7 +409,15 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
     best_ind <- initpop[which(rmse_num==min(rmse_num))[1],]
   }
 
-  best_ind_copy <- best_ind
+  if (Kint == 0){
+    best_ind_mains <- best_ind[1:Kvar]
+    best_ind_nonpar <- best_ind[as.numeric(Kvar+1):as.numeric(Kvar+Kvar)]
+    if (!is.null(always_par)){
+      best_ind_nonpar[best_ind_mains %in% always_par] <- "0"
+      best_ind <- c(best_ind_mains,best_ind_nonpar)
+    }
+  }
+
 
   #######Prepare results
   ##Extract included vars
@@ -395,15 +425,30 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
 
   results_list <- as.list(NULL)
 
-  results_list$best_gam <- biccalc2(best_ind,all_data,Kvar,Kint,k,family,method,optimizer)
+  if (is.null(xcolnames)){
+    results_list$best_gam <- biccalc2(best_ind,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
 
-  results_list$linear_mains <- temp_extract_vars$linear_mains
-  results_list$nonparametric_mains <- temp_extract_vars$nonlinear_mains
+    results_list$linear_mains <- temp_extract_vars$linear_mains
+    results_list$nonparametric_mains <- temp_extract_vars$nonlinear_mains
 
-  if (Kint > 0){
-    results_list$linear_interactions <- temp_extract_vars$linear_ints
-    results_list$nonparametric_interactions <- temp_extract_vars$nonlinear_ints
+    if (Kint > 0){
+      results_list$linear_interactions <- temp_extract_vars$linear_ints
+      results_list$nonparametric_interactions <- temp_extract_vars$nonlinear_ints
+    }
+
+  } else {
+    results_list$best_gam <- biccalc2(best_ind,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
+
+    results_list$linear_mains <- xcolnames[as.numeric(substr(temp_extract_vars$linear_mains,2,10))]
+    results_list$nonparametric_mains <- xcolnames[as.numeric(substr(temp_extract_vars$nonlinear_mains,2,10))]
+
+    if (Kint > 0){
+      results_list$linear_interactions <- ints_names_func(temp_extract_vars$linear_ints,xcolnames)
+      results_list$nonparametric_interactions <- ints_names_func(temp_extract_vars$nonlinear_ints,xcolnames)
+    }
+
   }
+
 
   ##Reduction
   if (!is.null(reduc)){
@@ -411,37 +456,71 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
       if (elem == 1){
         best_ind_red1 <- remove_mains_func(best_ind,all_data,Kvar,Kint,k,family,method,optimizer)
         temp_extract_vars <- extract_terms(best_ind_red1,Kvar,Kint)
-        results_list$best_gam_red1 <- biccalc2(best_ind_red1,all_data,Kvar,Kint,k,family,method,optimizer)
-        results_list$linear_mains_red1 <- temp_extract_vars$linear_mains
-        results_list$nonparametric_mains_red1 <- temp_extract_vars$nonlinear_mains
-        if (Kint > 0){
-          results_list$linear_interactions_red1 <- temp_extract_vars$linear_ints
-          results_list$nonparametric_interactions_red1 <- temp_extract_vars$nonlinear_ints
+        if (is.null(xcolnames)){
+          results_list$best_gam_red1 <- biccalc2(best_ind_red1,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
+          results_list$linear_mains_red1 <- temp_extract_vars$linear_mains
+          results_list$nonparametric_mains_red1 <- temp_extract_vars$nonlinear_mains
+          if (Kint > 0){
+            results_list$linear_interactions_red1 <- temp_extract_vars$linear_ints
+            results_list$nonparametric_interactions_red1 <- temp_extract_vars$nonlinear_ints
+          }
+        } else {
+          results_list$best_gam_red1 <- biccalc2(best_ind_red1,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
+          results_list$linear_mains_red1 <- xcolnames[as.numeric(substr(temp_extract_vars$linear_mains,2,10))]
+          results_list$nonparametric_mains_red1 <- xcolnames[as.numeric(substr(temp_extract_vars$nonlinear_mains,2,10))]
+          if (Kint > 0){
+            results_list$linear_interactions_red1 <- ints_names_func(temp_extract_vars$linear_ints,xcolnames)
+            results_list$nonparametric_interactions_red1 <- ints_names_func(temp_extract_vars$nonlinear_ints,xcolnames)
+          }
+
         }
       } else if (elem == 2){
         best_ind_red2 <- remove_nonpar_func(remove_mains_func(best_ind,all_data,Kvar,Kint,k,family,method,optimizer),all_data,Kvar,Kint,k,family,method,optimizer)
         temp_extract_vars <- extract_terms(best_ind_red2,Kvar,Kint)
-        results_list$best_gam_red2 <- biccalc2(best_ind_red2,all_data,Kvar,Kint,k,family,method,optimizer)
-        results_list$linear_mains_red2 <- temp_extract_vars$linear_mains
-        results_list$nonparametric_mains_red2 <- temp_extract_vars$nonlinear_mains
-        if (Kint > 0){
-          results_list$linear_interactions_red2 <- temp_extract_vars$linear_ints
-          results_list$nonparametric_interactions_red2 <- temp_extract_vars$nonlinear_ints
+        if (is.null(xcolnames)){
+          results_list$best_gam_red2 <- biccalc2(best_ind_red2,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
+          results_list$linear_mains_red2 <- temp_extract_vars$linear_mains
+          results_list$nonparametric_mains_red2 <- temp_extract_vars$nonlinear_mains
+          if (Kint > 0){
+            results_list$linear_interactions_red2 <- temp_extract_vars$linear_ints
+            results_list$nonparametric_interactions_red2 <- temp_extract_vars$nonlinear_ints
+          }
+        } else {
+          results_list$best_gam_red2 <- biccalc2(best_ind_red2,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
+          results_list$linear_mains_red2 <- xcolnames[as.numeric(substr(temp_extract_vars$linear_mains,2,10))]
+          results_list$nonparametric_mains_red2 <- xcolnames[as.numeric(substr(temp_extract_vars$nonlinear_mains,2,10))]
+          if (Kint > 0){
+            results_list$linear_interactions_red2 <- ints_names_func(temp_extract_vars$linear_ints,xcolnames)
+            results_list$nonparametric_interactions_red2 <- ints_names_func(temp_extract_vars$nonlinear_ints,xcolnames)
+          }
         }
       } else if (elem == 3){
         best_ind_red3 <- remove_nonpar_func(best_ind,all_data,Kvar,Kint,k,family,method,optimizer)
         temp_extract_vars <- extract_terms(best_ind_red3,Kvar,Kint)
-        results_list$best_gam_red3 <- biccalc2(best_ind_red3,all_data,Kvar,Kint,k,family,method,optimizer)
-        results_list$linear_mains_red3 <- temp_extract_vars$linear_mains
-        results_list$nonparametric_mains_red3 <- temp_extract_vars$nonlinear_mains
-        if (Kint > 0){
-          results_list$linear_interactions_red3 <- temp_extract_vars$linear_ints
-          results_list$nonparametric_interactions_red3 <- temp_extract_vars$nonlinear_ints
+        if (is.null(xcolnames)){
+          results_list$best_gam_red3 <- biccalc2(best_ind_red3,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
+          results_list$linear_mains_red3 <- temp_extract_vars$linear_mains
+          results_list$nonparametric_mains_red3 <- temp_extract_vars$nonlinear_mains
+          if (Kint > 0){
+            results_list$linear_interactions_red3 <- temp_extract_vars$linear_ints
+            results_list$nonparametric_interactions_red3 <- temp_extract_vars$nonlinear_ints
+          }
+        } else {
+          results_list$best_gam_red3 <- biccalc2(best_ind_red3,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
+          results_list$linear_mains_red3 <- xcolnames[as.numeric(substr(temp_extract_vars$linear_mains,2,10))]
+          results_list$nonparametric_mains_red3 <- xcolnames[as.numeric(substr(temp_extract_vars$nonlinear_mains,2,10))]
+          if (Kint > 0){
+            results_list$linear_interactions_red3 <- ints_names_func(temp_extract_vars$linear_ints,xcolnames)
+            results_list$nonparametric_interactions_red3 <- ints_names_func(temp_extract_vars$nonlinear_ints,xcolnames)
+          }
         }
+
       }
     }
   }
 
-  return(results_list)
+  to_return <- structure(results_list,class="gagam")
+
+  return(to_return)
 
 }
