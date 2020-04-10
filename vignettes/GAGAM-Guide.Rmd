@@ -21,7 +21,9 @@ This package implements a genetic algorithm which performs simulatenous variable
 $$g(\mathbb{E}(y_i)) = \alpha + \sum_{j\in \mathcal{L}} \beta_j x_{ij} + \sum_{k \in \mathcal{N}} f_k(x_{ik}) + \varepsilon_i$$
 For a given dependent variable and a set of explanatory variables, the genetic algorithm determines which regressors should be included linearly (set $\mathcal{L}$), which nonparametrically (set $\mathcal{N}$), and which should be excluded from the regression equation. The aim is to minimize the Bayesian Information Criterion value of the model.
 
-For more details on the motivation behind GAGAM and how it works, see the paper: Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". http://www.markcus.com/paper.pdf.
+For more details on the motivation behind GAGAM and how it works see the paper: Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". https://github.com/markcus1/gagam/blob/master/GAGAMpaper.pdf.
+
+A pdf `gagam` package manual is available here: https://github.com/markcus1/gagam/blob/master/gagam_package_manual.pdf.
 
 ## Getting Started
 ### Installation
@@ -35,12 +37,12 @@ library(gagam)
 ```
 
 ### Simple Example
-Suppose we have a dependent variable, $y$, ten explanatory variables, $x_1,x_2,\ldots,x_{10}$, and the true model only contains the first four. Moreover, $x_1, \ldots, x_3$ have a linear effect on $y$ while $x_4$ has a nonlinear relationship with the dependent variable. We now demonstrate how to use `gagam()` to extract the true model. 
+Suppose we have a dependent variable, $y$, ten explanatory variables, $x_1,x_2,\ldots,x_{10}$, and the true model only contains the first four. Moreover, $x_1$, $x_2$, $x_3$ have a linear effect on $y$ while $x_4$ has a nonlinear relationship with the dependent variable. We now demonstrate how to use `gagam()` to extract the true model. 
 
 Begin by generating the data:
 ```{r}
 N <- 500 #number of observations
-set.seed <- 123
+set.seed <- 125
 xdat <- matrix(rnorm(N*10,0,1),nrow=N,ncol=10) #matrix of explanatory variables (each drawn from N(0,1))
 ydat <- 4*xdat[,1]+5*xdat[,2]+6*xdat[,3]+(xdat[,4])^2 + 4 + rnorm(N,0,0.25) #generate y according to the true model
 ```
@@ -53,7 +55,7 @@ example_gagam
 
 The output is a list. The first element contains the optimal model as determined by GAGAM as a fitted `mgcv::gam` object. The second and third elements show which variables the algorithm included in the model linearly and nonparametrically, respectively.
 
-We can see that GAGAM correctly extracted the true model - $x_1, x_2, x_3$ are included linearly, $x_4$ is included nonparametrically, and the other variables are excluded.
+We can see that GAGAM correctly extracted the true model - $x_1$, $x_2$, $x_3$ are included linearly, $x_4$ is included nonparametrically, and the other variables are excluded.
 
 ## Arguments
 As the example above demonstrates, the main function implementing GAGAM is `gagam()`. This section explains the options available to the user when implementing `gagam()`.

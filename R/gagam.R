@@ -19,7 +19,7 @@
 #' @param family Specifies the family for the gam (see \code{\link[stats]{family}} and \code{\link[mgcv]{family.mgcv}}). Default is gaussian().
 #' @param method Specifies the metric for smoothing parameter selection (see \code{\link[mgcv]{gam}}). Default is "REML".
 #' @param optimizer Specifies the numerical optimization algorithm for the gam (see \code{\link[mgcv]{gam}}). Default is c("outer","newton").
-#' @param reduc Implements additional variable elimination methods at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See \href{https://github.com/markcus1/gagam/tree/master/R}{GAGAM paper} for an explanation of the methods. Default is NULL.
+#' @param reduc Implements additional variable elimination methods at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See the \href{https://github.com/markcus1/gagam/blob/master/GAGAMpaper.pdf}{GAGAM paper} for an explanation of the methods. Default is NULL.
 #' @param always_par Vector of the column numbers (in x) of the variables always estimated parametrically (for noncontinuous predictors).
 #'
 #' @return A list containing: \code{\link[mgcv]{gam}} object (fitted best model), vector of indexes or names of variables included linearly, vector of indexes or names of variables included nonparametrically (and the same lists for interactions if Kint is greater than 0).
@@ -43,7 +43,7 @@
 #' @import doParallel
 #' @import doMC
 #'
-#' @references Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". http://www.markcus.com/paper.pdf.
+#' @references Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". https://github.com/markcus1/gagam/blob/master/GAGAMpaper.pdf.
 gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,p_int = 0.1,p_nonpar=0.1,p_int_nonpar=0.1,multicore=TRUE,cores=NULL,k=10,bs="cr",family=gaussian(),method="REML",optimizer=c("outer","newton"),reduc=NULL,always_par=NULL){
   if(missing(y)){
     stop("Dependent variable is missing.")

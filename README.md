@@ -10,18 +10,21 @@
 This package implements a genetic algorithm which performs simulatenous
 variable selection and structure discovery in generalized additive
 models of the form:
-\[g(\mathbb{E}(y_i)) = \alpha + \sum_{j\in \mathcal{L}} \beta_j x_{ij} + \sum_{k \in \mathcal{N}} f_k(x_{ik}) + \varepsilon_i\]
+$$g(\mathbb{E}(y_i)) = \alpha + \sum_{j\in \mathcal{L}} \beta_j x_{ij} + \sum_{k \in \mathcal{N}} f_k(x_{ik}) + \varepsilon_i$$
 For a given dependent variable and a set of explanatory variables, the
 genetic algorithm determines which regressors should be included
-linearly (set \(\mathcal{L}\)), which nonparametrically (set
-\(\mathcal{N}\)), and which should be excluded from the regression
+linearly (set $\mathcal{L}$), which nonparametrically (set
+$\mathcal{N}$), and which should be excluded from the regression
 equation. The aim is to minimize the Bayesian Information Criterion
 value of the model.
 
-For more details on the motivation behind GAGAM and how it works, see
+For more details on the motivation behind GAGAM and how it works see
 the paper: Cus, Mark. 2020. “Simultaneous Variable Selection And
 Structure Discovery In Generalized Additive Models”.
-<http://www.markcus.com/paper.pdf>.
+<https://github.com/markcus1/gagam/blob/master/GAGAMpaper.pdf>.
+
+A pdf `gagam` package manual is available here:
+<https://github.com/markcus1/gagam/blob/master/gagam_package_manual.pdf>.
 
 ## Getting Started
 
@@ -45,17 +48,17 @@ library(gagam)
 
 ### Simple Example
 
-Suppose we have a dependent variable, \(y\), ten explanatory variables,
-\(x_1,x_2,\ldots,x_{10}\), and the true model only contains the first
-four. Moreover, \(x_1, \ldots, x_3\) have a linear effect on \(y\) while
-\(x_4\) has a nonlinear relationship with the dependent variable. We now
+Suppose we have a dependent variable, $y$, ten explanatory variables,
+$x_1,x_2,\ldots,x_{10}$, and the true model only contains the first
+four. Moreover, $x_1$, $x_2$, $x_3$ have a linear effect on $y$ while
+$x_4$ has a nonlinear relationship with the dependent variable. We now
 demonstrate how to use `gagam()` to extract the true model.
 
 Begin by generating the data:
 
 ``` r
 N <- 500 #number of observations
-set.seed <- 123
+set.seed <- 125
 xdat <- matrix(rnorm(N*10,0,1),nrow=N,ncol=10) #matrix of explanatory variables (each drawn from N(0,1))
 ydat <- 4*xdat[,1]+5*xdat[,2]+6*xdat[,3]+(xdat[,4])^2 + 4 + rnorm(N,0,0.25) #generate y according to the true model
 ```
@@ -64,7 +67,78 @@ We can now run GAGAM using:
 
 ``` r
 example_gagam <- gagam(y=ydat,x=xdat,Kvar=6,no_gen=50,multicore=FALSE)
+#> [1] "Generation: 1 of 50"
+#> [1] "Generation: 2 of 50"
+#> [1] "Generation: 3 of 50"
+#> [1] "Generation: 4 of 50"
+#> [1] "Generation: 5 of 50"
+#> [1] "Generation: 6 of 50"
+#> [1] "Generation: 7 of 50"
+#> [1] "Generation: 8 of 50"
+#> [1] "Generation: 9 of 50"
+#> [1] "Generation: 10 of 50"
+#> [1] "Generation: 11 of 50"
+#> [1] "Generation: 12 of 50"
+#> [1] "Generation: 13 of 50"
+#> [1] "Generation: 14 of 50"
+#> [1] "Generation: 15 of 50"
+#> [1] "Generation: 16 of 50"
+#> [1] "Generation: 17 of 50"
+#> [1] "Generation: 18 of 50"
+#> [1] "Generation: 19 of 50"
+#> [1] "Generation: 20 of 50"
+#> [1] "Generation: 21 of 50"
+#> [1] "Generation: 22 of 50"
+#> [1] "Generation: 23 of 50"
+#> [1] "Generation: 24 of 50"
+#> [1] "Generation: 25 of 50"
+#> [1] "Generation: 26 of 50"
+#> [1] "Generation: 27 of 50"
+#> [1] "Generation: 28 of 50"
+#> [1] "Generation: 29 of 50"
+#> [1] "Generation: 30 of 50"
+#> [1] "Generation: 31 of 50"
+#> [1] "Generation: 32 of 50"
+#> [1] "Generation: 33 of 50"
+#> [1] "Generation: 34 of 50"
+#> [1] "Generation: 35 of 50"
+#> [1] "Generation: 36 of 50"
+#> [1] "Generation: 37 of 50"
+#> [1] "Generation: 38 of 50"
+#> [1] "Generation: 39 of 50"
+#> [1] "Generation: 40 of 50"
+#> [1] "Generation: 41 of 50"
+#> [1] "Generation: 42 of 50"
+#> [1] "Generation: 43 of 50"
+#> [1] "Generation: 44 of 50"
+#> [1] "Generation: 45 of 50"
+#> [1] "Generation: 46 of 50"
+#> [1] "Generation: 47 of 50"
+#> [1] "Generation: 48 of 50"
+#> [1] "Generation: 49 of 50"
+#> [1] "Generation: 50 of 50"
 example_gagam
+#> $best_gam
+#> 
+#> Family: gaussian 
+#> Link function: identity 
+#> 
+#> Formula:
+#> y ~ x3 + x1 + x2 + s(x4, bs = "cr", k = 10)
+#> 
+#> Estimated degrees of freedom:
+#> 8.1  total = 12.1 
+#> 
+#> REML score: 52.69499     
+#> 
+#> $linear_mains
+#> [1] "x3" "x1" "x2"
+#> 
+#> $nonparametric_mains
+#> [1] "x4"
+#> 
+#> attr(,"class")
+#> [1] "gagam"
 ```
 
 The output is a list. The first element contains the optimal model as
@@ -73,7 +147,7 @@ elements show which variables the algorithm included in the model
 linearly and nonparametrically, respectively.
 
 We can see that GAGAM correctly extracted the true model -
-\(x_1, x_2, x_3\) are included linearly, \(x_4\) is included
+$x_1$, $x_2$, $x_3$ are included linearly, $x_4$ is included
 nonparametrically, and the other variables are excluded.
 
 ## Arguments
@@ -222,6 +296,30 @@ allow the user to pass through additional arguments for
 
 ``` r
 summary(example_gagam)
+#> 
+#> Family: gaussian 
+#> Link function: identity 
+#> 
+#> Formula:
+#> y ~ x3 + x1 + x2 + s(x4, bs = "cr", k = 10)
+#> 
+#> Parametric coefficients:
+#>             Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)  4.98238    0.01136   438.5   <2e-16 ***
+#> x3           5.99686    0.01095   547.6   <2e-16 ***
+#> x1           4.01328    0.01122   357.7   <2e-16 ***
+#> x2           5.00179    0.01137   439.9   <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> Approximate significance of smooth terms:
+#>         edf Ref.df    F p-value    
+#> s(x4) 8.104  8.706 1410  <2e-16 ***
+#> ---
+#> Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+#> 
+#> R-sq.(adj) =  0.999   Deviance explained = 99.9%
+#> -REML = 52.695  Scale est. = 0.064403  n = 500
 plot(example_gagam)
 ```
 

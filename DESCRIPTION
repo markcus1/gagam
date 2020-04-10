@@ -24,4 +24,4 @@ Suggests:
     rmarkdown,
     mlbench
 VignetteBuilder: knitr
-References: Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". http://www.markcus.com/paper.pdf.
+References: Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". https://github.com/markcus1/gagam/blob/master/GAGAMpaper.pdf.
