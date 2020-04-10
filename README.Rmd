@@ -145,4 +145,3 @@ x <- BostonHousing[,1:13]
 
 #summary(boston_gam)
 ```
-

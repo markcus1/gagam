@@ -10,7 +10,11 @@
 This package implements a genetic algorithm which performs simulatenous
 variable selection and structure discovery in generalized additive
 models of the form:
-$$g(\mathbb{E}(y_i)) = \alpha + \sum_{j\in \mathcal{L}} \beta_j x_{ij} + \sum_{k \in \mathcal{N}} f_k(x_{ik}) + \varepsilon_i$$
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/01.gif?token=ANVUEY2ORVGTJZOIJMBGQT26TIZSW">
+</p>
+
 For a given dependent variable and a set of explanatory variables, the
 genetic algorithm determines which regressors should be included
 linearly (set $\mathcal{L}$), which nonparametrically (set
