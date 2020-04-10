@@ -17,8 +17,8 @@ models of the form:
 
 For a given dependent variable and a set of explanatory variables, the
 genetic algorithm determines which regressors should be included
-linearly (set $\mathcal{L}$), which nonparametrically (set
-$\mathcal{N}$), and which should be excluded from the regression
+linearly (set <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/02.gif?token=ANVUEY572CBQSO4FBFW2HA26TI4YQ">), which nonparametrically (set
+<img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/03.gif?token=ANVUEYYHY7CCG45ZDRPTYBC6TI432">), and which should be excluded from the regression
 equation. The aim is to minimize the Bayesian Information Criterion
 value of the model.
 
@@ -52,10 +52,10 @@ library(gagam)
 
 ### Simple Example
 
-Suppose we have a dependent variable, $y$, ten explanatory variables,
-$x_1,x_2,\ldots,x_{10}$, and the true model only contains the first
-four. Moreover, $x_1$, $x_2$, $x_3$ have a linear effect on $y$ while
-$x_4$ has a nonlinear relationship with the dependent variable. We now
+Suppose we have a dependent variable, <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/04.gif?token=ANVUEY6JUWHTPMWY5663LQS6TI5BQ">, ten explanatory variables,
+<img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/05.gif?token=ANVUEYZ2WJRJTWJX2G7EG5S6TI5DI">, and the true model only contains the first
+four. Moreover, <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/06.gif?token=ANVUEY7WMQBVCJUO4L6KFJK6TI5GC">, <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/07.gif?token=ANVUEY7LNCPZODD3RRIOI7C6TI5IQ">, <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/08.gif?token=ANVUEYYZTMVDV2VTTJFYD3K6TI5L4"> have a linear effect on <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/09.gif?token=ANVUEYYHIBP4VLYQEULM6Q26TI5OS"> while
+<img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/10.gif?token=ANVUEY75UYUZHPEKPLN7PT26TI5Q2"> has a nonlinear relationship with the dependent variable. We now
 demonstrate how to use `gagam()` to extract the true model.
 
 Begin by generating the data:
@@ -151,7 +151,7 @@ elements show which variables the algorithm included in the model
 linearly and nonparametrically, respectively.
 
 We can see that GAGAM correctly extracted the true model -
-$x_1$, $x_2$, $x_3$ are included linearly, $x_4$ is included
+<img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/06.gif?token=ANVUEY7WMQBVCJUO4L6KFJK6TI5GC">, <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/07.gif?token=ANVUEY7LNCPZODD3RRIOI7C6TI5IQ">, <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/08.gif?token=ANVUEYYZTMVDV2VTTJFYD3K6TI5L4"> are included linearly, <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/10.gif?token=ANVUEY75UYUZHPEKPLN7PT26TI5Q2"> is included
 nonparametrically, and the other variables are excluded.
 
 ## Arguments
@@ -192,8 +192,8 @@ the user can increase it in steps of 500 (e.g. to 1000, 1500, 2000, …).
 example above we had 10 explanatory variables but we decided that we
 will only choose among models with six or fewer predictors. This
 argument is especially important if we have more explanatory variables
-than observations ($p>n$). Then, `Kvar` should always be set to a
-number lower than $n$, otherwise the algorithm might arrive at an
+than observations (<img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/15.gif?token=ANVUEY4SIDTHPJIUYRPEBJK6TI5ZO">). Then, `Kvar` should always be set to a
+number lower than <img src="https://raw.githubusercontent.com/markcus1/gagam/master/equations/16.gif?token=ANVUEYYUZNS5FGTMSPB2FOC6TI55G">, otherwise the algorithm might arrive at an
 overdetermined model and return an error.
 
 `Kint` extends the model from the introduction to also allow first-order
