@@ -454,7 +454,7 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
   if (!is.null(reduc)){
     for (elem in reduc){
       if (elem == 1){
-        best_ind_red1 <- remove_mains_func(best_ind,all_data,Kvar,Kint,k,family,method,optimizer)
+        best_ind_red1 <- remove_mains_func(best_ind,all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par)
         temp_extract_vars <- extract_terms(best_ind_red1,Kvar,Kint)
         if (is.null(xcolnames)){
           results_list$best_gam_red1 <- biccalc2(best_ind_red1,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
@@ -475,7 +475,7 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
 
         }
       } else if (elem == 2){
-        best_ind_red2 <- remove_nonpar_func(remove_mains_func(best_ind,all_data,Kvar,Kint,k,family,method,optimizer),all_data,Kvar,Kint,k,family,method,optimizer)
+        best_ind_red2 <- remove_nonpar_func(remove_mains_func(best_ind,all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par),all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par)
         temp_extract_vars <- extract_terms(best_ind_red2,Kvar,Kint)
         if (is.null(xcolnames)){
           results_list$best_gam_red2 <- biccalc2(best_ind_red2,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)
@@ -495,7 +495,7 @@ gagam <- function(y,x,pop_size = 500,Kvar = 15,Kint = 0,no_gen = 100,p_m = 0.05,
           }
         }
       } else if (elem == 3){
-        best_ind_red3 <- remove_nonpar_func(best_ind,all_data,Kvar,Kint,k,family,method,optimizer)
+        best_ind_red3 <- remove_nonpar_func(best_ind,all_data,Kvar,Kint,k,bs,family,method,optimizer,always_par)
         temp_extract_vars <- extract_terms(best_ind_red3,Kvar,Kint)
         if (is.null(xcolnames)){
           results_list$best_gam_red3 <- biccalc2(best_ind_red3,all_data,Kvar,Kint,k,bs,family,method,optimizer,xcolnames,always_par)

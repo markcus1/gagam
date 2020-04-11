@@ -10,9 +10,11 @@ remove_mains_func(
   Kvar,
   Kint,
   k,
+  bs,
   family,
   method,
-  optimizer
+  optimizer,
+  always_par
 )
 }
 \arguments{
@@ -26,11 +28,15 @@ remove_mains_func(
 
 \item{k}{Basis dimension for nonparametric terms estimated using cubic splines.}
 
+\item{bs}{Spline basis.}
+
 \item{family}{Specifies the family for the gam (see ?family and ?family.mgcv). Default is gaussian().}
 
 \item{method}{Specifies the metric for smoothing parameter selection (see ?gam). Default is "REML".}
 
 \item{optimizer}{Specifies the numerical optimization algorithm for the gam (see ?gam). Default is c("outer","newton").}
+
+\item{always_par}{Specifies which variables are always estimated parametrically}
 }
 \value{
 Reduced model.

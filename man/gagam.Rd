@@ -61,7 +61,7 @@ gagam(
 
 \item{optimizer}{Specifies the numerical optimization algorithm for the gam (see \code{\link[mgcv]{gam}}). Default is c("outer","newton").}
 
-\item{reduc}{Implements additional variable elimination methods at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See \href{https://github.com/markcus1/gagam/tree/master/R}{GAGAM paper} for an explanation of the methods. Default is NULL.}
+\item{reduc}{Implements additional variable elimination methods at the end of the run of the genetic algorithm. User can choose between methods 1, 2, and 3. Multiple methods can be chosen. E.g. reduc=c(1) or reduc=c(1,3). See the \href{https://github.com/markcus1/gagam/blob/master/GAGAMpaper.pdf}{GAGAM paper} for an explanation of the methods. Default is NULL.}
 
 \item{always_par}{Vector of the column numbers (in x) of the variables always estimated parametrically (for noncontinuous predictors).}
 }
@@ -83,5 +83,5 @@ example_gagam <- gagam(ydat,xdat,Kvar = 6,no_gen = 50)
 
 }
 \references{
-Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". http://www.markcus.com/paper.pdf.
+Cus, Mark. 2020. "Simultaneous Variable Selection And Structure Discovery In Generalized Additive Models". https://github.com/markcus1/gagam/blob/master/GAGAMpaper.pdf.
 }
