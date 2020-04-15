@@ -440,7 +440,7 @@ boston_gagam <- gagam(y,x,Kvar = 13,always_par = c(2,4,9))
 #> [1] "Generation: 98 of 100"
 #> [1] "Generation: 99 of 100"
 #> [1] "Generation: 100 of 100"
-summary(boston_gam)
+summary(boston_gagam)
 #> 
 #> Family: gaussian 
 #> Link function: identity 

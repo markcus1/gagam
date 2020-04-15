@@ -143,5 +143,5 @@ x <- BostonHousing[,1:13]
 
 #boston_gagam <- gagam(y,x,Kvar = 13,always_par = c(2,4,9))
 
-#summary(boston_gam)
+#summary(boston_gagam)
 ```
