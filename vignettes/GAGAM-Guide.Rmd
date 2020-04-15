@@ -107,7 +107,7 @@ The user is allowed to specify a number of algorithm parameters*:
 
 `optimizer` specifies the optimization method to optimize the criterion given by `method`. See `mgcv::gam` for more details.
 
-`always_par` allows the user to force some terms to always enter the model parametrically. This is useful if we have noncontinuous predictors such as dummy variables. In the extreme, one might make all variables parametric and use GAGAM just for variable selection. `always_par` should be specified as a numerical vector where the elements give the column numbers in `x` of variables to be estimated parametrically, e.g. `always_par=c(1,2,3)` will ensure that the variables in the first three columns of `x` are always parametric. 
+`always_par` allows the user to force some terms to always enter the model parametrically. This is useful if we have noncontinuous predictors such as dummy variables. In the extreme, one might make all variables parametric and use GAGAM just for variable selection. `always_par` should be specified as a numeric vector where the elements give the column numbers in `x` of variables to be estimated parametrically, e.g. `always_par=c(1,2,3)` will ensure that the variables in the first three columns of `x` are always parametric. 
 
 ### Model Reduction
 As mentioned in the introduction and in the paper, GAGAM uses the BIC to judge the quality of the models. In small samples some noise variables can reduce the BIC and get included in the recommended model. To counter this, `gagam` implements three variable elimination methods (chosen using the argument `reduc`):

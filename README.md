@@ -258,7 +258,7 @@ given by `method`. See `mgcv::gam` for more details.
 model parametrically. This is useful if we have noncontinuous predictors
 such as dummy variables. In the extreme, one might make all variables
 parametric and use GAGAM just for variable selection. `always_par`
-should be specified as a numerical vector where the elements give the
+should be specified as a numeric vector where the elements give the
 column numbers in `x` of variables to be estimated parametrically, e.g.
 `always_par=c(1,2,3)` will ensure that the variables in the first three
 columns of `x` are always parametric.
@@ -339,7 +339,134 @@ data(BostonHousing)
 y <- BostonHousing[,14]
 x <- BostonHousing[,1:13]
 
-#boston_gagam <- gagam(y,x,Kvar = 13,always_par = c(2,4,9))
-
-#summary(boston_gam)
+boston_gagam <- gagam(y,x,Kvar = 13,always_par = c(2,4,9))
+#> [1] "Generation: 1 of 100"
+#> [1] "Generation: 2 of 100"
+#> [1] "Generation: 3 of 100"
+#> [1] "Generation: 4 of 100"
+#> [1] "Generation: 5 of 100"
+#> [1] "Generation: 6 of 100"
+#> [1] "Generation: 7 of 100"
+#> [1] "Generation: 8 of 100"
+#> [1] "Generation: 9 of 100"
+#> [1] "Generation: 10 of 100"
+#> [1] "Generation: 11 of 100"
+#> [1] "Generation: 12 of 100"
+#> [1] "Generation: 13 of 100"
+#> [1] "Generation: 14 of 100"
+#> [1] "Generation: 15 of 100"
+#> [1] "Generation: 16 of 100"
+#> [1] "Generation: 17 of 100"
+#> [1] "Generation: 18 of 100"
+#> [1] "Generation: 19 of 100"
+#> [1] "Generation: 20 of 100"
+#> [1] "Generation: 21 of 100"
+#> [1] "Generation: 22 of 100"
+#> [1] "Generation: 23 of 100"
+#> [1] "Generation: 24 of 100"
+#> [1] "Generation: 25 of 100"
+#> [1] "Generation: 26 of 100"
+#> [1] "Generation: 27 of 100"
+#> [1] "Generation: 28 of 100"
+#> [1] "Generation: 29 of 100"
+#> [1] "Generation: 30 of 100"
+#> [1] "Generation: 31 of 100"
+#> [1] "Generation: 32 of 100"
+#> [1] "Generation: 33 of 100"
+#> [1] "Generation: 34 of 100"
+#> [1] "Generation: 35 of 100"
+#> [1] "Generation: 36 of 100"
+#> [1] "Generation: 37 of 100"
+#> [1] "Generation: 38 of 100"
+#> [1] "Generation: 39 of 100"
+#> [1] "Generation: 40 of 100"
+#> [1] "Generation: 41 of 100"
+#> [1] "Generation: 42 of 100"
+#> [1] "Generation: 43 of 100"
+#> [1] "Generation: 44 of 100"
+#> [1] "Generation: 45 of 100"
+#> [1] "Generation: 46 of 100"
+#> [1] "Generation: 47 of 100"
+#> [1] "Generation: 48 of 100"
+#> [1] "Generation: 49 of 100"
+#> [1] "Generation: 50 of 100"
+#> [1] "Generation: 51 of 100"
+#> [1] "Generation: 52 of 100"
+#> [1] "Generation: 53 of 100"
+#> [1] "Generation: 54 of 100"
+#> [1] "Generation: 55 of 100"
+#> [1] "Generation: 56 of 100"
+#> [1] "Generation: 57 of 100"
+#> [1] "Generation: 58 of 100"
+#> [1] "Generation: 59 of 100"
+#> [1] "Generation: 60 of 100"
+#> [1] "Generation: 61 of 100"
+#> [1] "Generation: 62 of 100"
+#> [1] "Generation: 63 of 100"
+#> [1] "Generation: 64 of 100"
+#> [1] "Generation: 65 of 100"
+#> [1] "Generation: 66 of 100"
+#> [1] "Generation: 67 of 100"
+#> [1] "Generation: 68 of 100"
+#> [1] "Generation: 69 of 100"
+#> [1] "Generation: 70 of 100"
+#> [1] "Generation: 71 of 100"
+#> [1] "Generation: 72 of 100"
+#> [1] "Generation: 73 of 100"
+#> [1] "Generation: 74 of 100"
+#> [1] "Generation: 75 of 100"
+#> [1] "Generation: 76 of 100"
+#> [1] "Generation: 77 of 100"
+#> [1] "Generation: 78 of 100"
+#> [1] "Generation: 79 of 100"
+#> [1] "Generation: 80 of 100"
+#> [1] "Generation: 81 of 100"
+#> [1] "Generation: 82 of 100"
+#> [1] "Generation: 83 of 100"
+#> [1] "Generation: 84 of 100"
+#> [1] "Generation: 85 of 100"
+#> [1] "Generation: 86 of 100"
+#> [1] "Generation: 87 of 100"
+#> [1] "Generation: 88 of 100"
+#> [1] "Generation: 89 of 100"
+#> [1] "Generation: 90 of 100"
+#> [1] "Generation: 91 of 100"
+#> [1] "Generation: 92 of 100"
+#> [1] "Generation: 93 of 100"
+#> [1] "Generation: 94 of 100"
+#> [1] "Generation: 95 of 100"
+#> [1] "Generation: 96 of 100"
+#> [1] "Generation: 97 of 100"
+#> [1] "Generation: 98 of 100"
+#> [1] "Generation: 99 of 100"
+#> [1] "Generation: 100 of 100"
+summary(boston_gam)
+#> 
+#> Family: gaussian 
+#> Link function: identity 
+#> 
+#> Formula:
+#> y ~ rad + tax + nox + ptratio + s(dis, bs = "cr", k = 10) + s(lstat, bs = "cr", k = 10) + s(rm, bs = "cr", k = 10) + s(crim, bs = "cr", k = 10)
+#> 
+#> Parametric coefficients:
+#>               Estimate Std. Error t value Pr(>|t|)    
+#> (Intercept)  47.434816   2.673583  17.742  < 2e-16 ***
+#> rad           0.355996   0.058860   6.048 2.95e-09 ***
+#> tax          -0.011635   0.002609  -4.459 1.02e-05 ***
+#> nox         -18.552051   3.023186  -6.137 1.77e-09 ***
+#> ptratio      -0.718537   0.097222  -7.391 6.54e-13 ***
+#> ---
+#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#> 
+#> Approximate significance of smooth terms:
+#>            edf Ref.df     F  p-value    
+#> s(dis)   7.714  8.381 19.61  < 2e-16 ***
+#> s(lstat) 5.791  6.751 43.75  < 2e-16 ***
+#> s(rm)    5.561  6.401 31.77  < 2e-16 ***
+#> s(crim)  2.082  2.281 32.84 5.51e-12 ***
+#> ---
+#> Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+#> 
+#> R-sq.(adj) =  0.857   Deviance explained = 86.4%
+#> -REML = 1379.7  Scale est. = 12.07     n = 506
 ```
